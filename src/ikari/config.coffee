@@ -1,28 +1,28 @@
-define [], ->
+Config =
+  prefix     : "i"
+  statements : [
+    "loop"
+    "if"
+  ]
+  options    :  [
+    "val-only"
+  ]
 
-  Config =
-    prefix     : "i"
-    statements : [
-      "loop"
-      "if"
-    ]
-    options    :  [
-      "val-only"
-    ]
+  #閉じタグ要らない奴
+  singleTags : [
+    "img"
+    "input"
+    "br"
+    "meta"
+    "hr"
+    "embed"
+    "area"
+    "base"
+    "col"
+    "keygen"
+    "link"
+    "param"
+    "source"
+  ]
 
-    #閉じタグ要らない奴
-    singleTags : [
-      "img"
-      "input"
-      "br"
-      "meta"
-      "hr"
-      "embed"
-      "area"
-      "base"
-      "col"
-      "keygen"
-      "link"
-      "param"
-      "source"
-    ]
+module.exports = Config

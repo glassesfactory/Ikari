@@ -3,7 +3,6 @@ path    = require "path"
 
 #resouces
 packagejson     = require "./package.json"
-requirejsHelper = require "requirejs-helper"
 
 
 module.exports = (grunt)->
@@ -80,38 +79,31 @@ module.exports = (grunt)->
           "work/html/index.html": "work/jade/*.jade"
 
 
+    browserify:
+      dist:
+        files:
+          "dist/ikari.js": ["tmp/**/*.js"]
+        options:
+          transform: ["uglifyify"]
+
     #ファイル変更の監視
     watch:
       coffee:
         files: ["src/**/*.coffee", ]
-        tasks: ["clean:tmp","coffee:product", "requirejs"]
+        tasks: ["clean:tmp","coffee:product", "browserify"]
 
       jade:
         files: ["work/**/*.jade"]
         tasks: ["jade"]
 
 
-  grunt.initConfig(config)
 
-  #ここに生成したいファイルを追加していく
-  requirejsHelper.config
-    dist:
-      inDir  : "tmp"
-      outDir : "dist"
-      names: [
-        "ikari"
-      ]
+
+  grunt.initConfig(config)
 
   #余計なことしないためにデフォルトを封印
   grunt.registerTask "default", []
 
-
-
-  grunt.registerTask "requirejs", "requirejs(:release)", (release)->
-    done = @async()
-    requirejsHelper.build release == "release", ()->
-      console.info "Complete"
-      done()
 
   grunt.registerTask "setup", ()->
     grunt.task.run [
@@ -126,7 +118,7 @@ module.exports = (grunt)->
     grunt.task.run [
       "clean:start"
       "coffee:product"
-      "requirejs"
+      "browserify"
       "watch"
     ]
 
@@ -138,7 +130,7 @@ module.exports = (grunt)->
       "coffee:product"
       "concat:vendors"
       "copy:lib"
-      "requirejs:release"
+      "browserify"
     ]
 
   # grunt.registerTask "deploy"
