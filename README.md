@@ -14,7 +14,7 @@ engine = new Ikari
 
 ```jade
 ul#test
-  li(i-loop="item in collection", i-id="collections" class="{{ item.age }}").test
+  li(i-loop="item in collection", i-id="collections" class="age-{{ item.age }}").test
     div(i-if="item.age > 19") おっとなー
     a(href="/users/{{ item.id }}") 
       {{ item.id }} {{ item.name }}
@@ -41,13 +41,13 @@ engine.create collection
 
 ```html
 <ul id="test">
-  <li>
+  <li class="age-3 test">
     <a href="/users/1">
       1 おじさん
       <img src="/assets/images/1.jpg">
     </a>
   </li>
-  <li>
+  <li class="age-40 test">
     <div>おっとなー</div>
     <a href="/users/2">
       2 めだまやき
