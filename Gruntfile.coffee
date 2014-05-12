@@ -1,13 +1,5 @@
-_       = require "underscore"
-path    = require "path"
-
-#resouces
-packagejson     = require "./package.json"
-
-
 module.exports = (grunt)->
-  #package.json から持ってくる
-  _.each _.keys( packagejson.devDependencies ),(key)-> grunt.loadNpmTasks(key) if key.indexOf( "grunt-" ) == 0
+  require('load-grunt-tasks')(grunt)
 
   config =
     #ディレクトリを掃除する
@@ -22,8 +14,7 @@ module.exports = (grunt)->
         "libs/vendors"
       ]
       start: [
-        "dist/*.html"
-        "dist/**/*.html"
+        "dist/{,**/}*.html"
       ]
       afterSetup: [
         "setup"
@@ -53,7 +44,6 @@ module.exports = (grunt)->
         files:[
           #bower で入るライブラリ
           "work/html/assets/scripts/vendor.js" : "setup/vendor.js"
-          "work/html/assets/scripts/almond.js" : "libs/almond/almond.js"
         ]
 
 
@@ -65,11 +55,11 @@ module.exports = (grunt)->
           bare: false
         expand: true
         cwd: "src"
-        src: ['*.coffee', '**/*.coffee']
+        src: "{,**/}*.coffee"
         dest: "tmp"
         ext: '.js'
 
-
+    #for development.(主に俺。)
     jade:
       work:
         options:
@@ -82,18 +72,18 @@ module.exports = (grunt)->
     browserify:
       dist:
         files:
-          "dist/ikari.js": ["tmp/**/*.js"]
+          "dist/ikari.js": ["tmp/{,**/}*.js"]
         options:
           transform: ["uglifyify"]
 
     #ファイル変更の監視
     watch:
       coffee:
-        files: ["src/**/*.coffee", ]
+        files: ["src/{,**/}*.coffee", ]
         tasks: ["clean:tmp","coffee:product", "browserify"]
 
       jade:
-        files: ["work/**/*.jade"]
+        files: ["work/{,**/}*.jade"]
         tasks: ["jade"]
 
 
