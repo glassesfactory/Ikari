@@ -55,15 +55,12 @@ class Ikari
     @private
   ###
   _update:(data, dom)=>
-    container = document.createElement "div"
     tmp = @compiler(data)
+    container = document.createElement "div"
     container.innerHTML = tmp
-
     children = container.children
-
     fragment = document.createDocumentFragment()
-    for child in children
-      fragment.appendChild(child.cloneNode(true)) if child
+    fragment.appendChild(child.cloneNode(true)) for child in children when child
     @builder.el.appendChild fragment
     return
 
