@@ -18,7 +18,7 @@ engine = new Ikari
 
 ```jade
 ul#test
-  li(i-loop="item in collection", i-id="collections" class="age-{{ item.age }}").test
+  li(i-loop="item in collection" i-id="collections" class="age-{{ item.age }}").test
     div(i-if="item.age > 19") おっとなー
     a(href="/users/{{ item.id }}") 
       {{ item.id }} {{ item.name }}
