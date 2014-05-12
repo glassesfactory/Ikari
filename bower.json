@@ -1,0 +1,22 @@
+{
+  "name": "ikari",
+  "version": "0.1.0",
+  "authors": [
+    "Yamaguchi Eikichi"
+  ],
+  "description": "Simple HTML Binding Template Engine",
+  "main": "dist/ikari.js",
+  "keywords": [
+    "template"
+  ],
+  "license": "MIT",
+  "homepage": "http://theglue.jp",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {}
+}

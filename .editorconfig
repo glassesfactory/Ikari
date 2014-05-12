@@ -1,0 +1,30 @@
+root = true
+
+[*]
+trim_trailing_whitespace = true
+charset = 'utf-8'
+
+[*.py]
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+[*.coffee]
+indent_style = space
+indent_size = 2
+
+[*.styl]
+indent_style = space
+indent_size = 2
+
+[*.jade]
+indent_style = space
+indent_size = 2
+
+[*.slim]
+indent_style = space
+indent_size = 2
+
+[*.scss]
+indent_style = space
+indent_size = 2

@@ -1,0 +1,28 @@
+{
+  "name": "Ikari",
+  "version": "0.1.0",
+  "description": "Simple HTML Binding Template Engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "template"
+  ],
+  "author": "Yamaguchi Eikichi",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt-cli": "~0.1.13",
+    "grunt": "~0.4.4",
+    "requirejs-helper": "http://kageyama-dev.s3.amazonaws.com/tgz/requirejs-helper.tar.gz",
+    "grunt-contrib-coffee": "~0.10.1",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-contrib-jade": "~0.11.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-concat": "~0.4.0",
+    "requirejs": "~2.1.11",
+    "underscore": "~1.5.2",
+    "grunt-bower-task": "~0.3.4"
+  }
+}
