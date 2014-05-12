@@ -70,4 +70,3 @@ class Ikari
 
 do(window)->
   window.Ikari = Ikari
-# module.exports = Ikari
