@@ -7,6 +7,10 @@ Ikari
 Usage
 -------
 
+```jade
+script(type="text/javascript" src="path/to/ikari.js")
+```
+
 ```coffeescript
 engine = new Ikari
   el : "#test"
