@@ -10,11 +10,6 @@ define [
   escaper
 )->
 
-
-  #ばりゅー
-  VAL_RE = /^{{2,3}([\w]+|[\w]+\.\w+)}{2,3}/g
-
-
   class Ikari
 
     builder : null
