@@ -33,4 +33,14 @@ util =
     el.removeChild el.firstChild while el.firstChild
     return el
 
+
+  _inArray:( elem, array )->
+    i = 0
+    len = array.length
+    while i < len
+      if array[ i ] is elem
+        return i
+      i++
+    return -1
+
 module.exports = util

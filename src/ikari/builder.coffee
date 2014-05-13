@@ -1,5 +1,6 @@
 Config = require "./config"
 Dom    = require "./dom"
+Event  = require "./event"
 
 
 class Builder
@@ -17,8 +18,12 @@ class Builder
 
     @funcStr = ["var p = [];"]
     @args = []
+
+
+  build:(vm)=>
     dom = @_parseElment @el, vm
     @_build(dom, @funcStr, vm)
+    return
 
 
   ###*
@@ -44,7 +49,8 @@ class Builder
     args = [].concat(@args)
     args.push str
     vm.compiler = new Function( args... )
-    # console.log vm.compiler([{"age": 1}, {"age": 11}]), "てすと"
+    #event 出す
+    vm.emit new Event(Event.BUILDED)
     return
 
 ###*

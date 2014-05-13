@@ -2,8 +2,9 @@ utils   = require "./ikari/utils"
 Config  = require "./ikari/config"
 Builder = require "./ikari/builder"
 escaper = require "./ikari/escaper"
+Emitter = require "./ikari/emitter"
 
-class Ikari
+class Ikari extends Emitter
 
   builder : null
 
@@ -11,19 +12,36 @@ class Ikari
 
   compiler : null
 
+  autoBuild : false
+  isBuilded : false
+
   ###*
     Simple HTML Binding Template Engine.
     @class Ikari
     @param options {Object}
   ###
   constructor:(options={})->
-    el     = utils.kv "el", options
-    @datas = utils.kv "datas", options
+    super()
+    el         = utils.kv "el", options
+    @datas     = utils.kv "datas", options
+    @autoBuild = utils.kv "autoBuild", options, false
 
     unless el
       throw new Error("エレメントはなんかしていして") # or body?
 
     @builder = new Builder el, this
+    @builder.build this if @autoBuild and not @isBuilded
+
+
+
+  ###*
+    ビルドする
+    @method
+  ###
+  build:()=>
+    @builder.build this
+    return
+
 
 
   ###*
