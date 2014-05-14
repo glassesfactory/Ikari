@@ -12,6 +12,7 @@ util =
     else
       return if defaultValue then defaultValue else null
 
+
   ###*
     継承する
   ###
@@ -34,6 +35,10 @@ util =
     return el
 
 
+  ###*
+    配列の中に入っているかどうか
+    @method _inArray
+  ###
   _inArray:( elem, array )->
     i = 0
     len = array.length
@@ -42,5 +47,13 @@ util =
         return i
       i++
     return -1
+
+
+  ###*
+    セレクタ取ってくる
+    @method query
+  ###
+  query: (q)->
+    return if typeof q is "string" then document.querySelector q else q
 
 module.exports = util

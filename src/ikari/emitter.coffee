@@ -20,10 +20,9 @@ class Emitter
     @param {Function} listener イベントが発生した時に実行するリスナー
   ###
   on:(type, listener)->
-    if not @listeners
-      @listeners = {}
+    @listeners ?= {}
     if @listeners[ type ] is undefined
-      @listeners[ type ] =[]
+      @listeners[ type ] = []
 
     if utils._inArray(listener, @listeners[type]) < 0
       @listeners[type].push listener
@@ -42,7 +41,7 @@ class Emitter
     if len < 1
       return
     arr = @listeners[type]
-    if not arr
+    unless arr
       return
     i = 0
     len = arr.length
@@ -65,7 +64,6 @@ class Emitter
       eventObj.target = @
       for handler in ary
         handler.call(@, eventObj) if eventObj.isPropagate and handler
-
     return
 
 

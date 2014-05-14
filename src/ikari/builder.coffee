@@ -1,6 +1,7 @@
 Config = require "./config"
 Dom    = require "./dom"
 Event  = require "./event"
+utils  = require "./utils"
 
 
 class Builder
@@ -14,12 +15,17 @@ class Builder
     @class Builder
   ###
   constructor:(el, vm)->
-    @el = query el
+    @el = utils.query el
 
     @funcStr = ["var p = [];"]
     @args = []
 
 
+  ###*
+    ビルドを実行する
+    @method build
+    @param vm {Ikari}
+  ###
   build:(vm)=>
     dom = @_parseElment @el, vm
     @_build(dom, @funcStr, vm)
@@ -28,6 +34,12 @@ class Builder
 
   ###*
     エレメントをパースする
+    @method _parseElement
+    @private
+    @param el {Node}
+    @param vm {Ikari}
+    @param parent {Dom}
+    @return {Dom}
   ###
   _parseElment:(el, vm, parent)=>
     dom = new Dom(el, vm)
@@ -42,23 +54,27 @@ class Builder
     return dom
 
 
-  _build:(dom, funcStr, vm)=>
-    dom.build(funcStr)
-    funcStr.push 'return p.join("");'
-    str = funcStr.join("")
+  ###*
+    ビルドを実行する
+    @method _build
+    @private
+    @param dom {Dom}
+    @param funcStrs {Array}
+    @param vm {Ikari}
+  ###
+  _build:(dom, funcStrs, vm)=>
+    dom.build(funcStrs)
+    funcStrs.push 'return p.join("");'
+    str = funcStrs.join("")
     args = [].concat(@args)
     args.push str
     vm.compiler = new Function( args... )
+    vm.isBuilded = true
+    localStorage.setItem vm.compilerCacheName, args if vm.cachable
+
     #event 出す
     vm.emit new Event(Event.BUILDED)
     return
-
-###*
-  セレクタ取ってくる
-  @method query
-###
-query = (q)->
-  return if typeof q is "string" then document.querySelector q else q
 
 
 module.exports = Builder

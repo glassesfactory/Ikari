@@ -14,7 +14,15 @@ class Ikari extends Emitter
   compiler : null
 
   autoBuild : false
+
+  #ビルドが完了しているかどうか
   isBuilded : false
+
+  compilerCacheName : null
+
+  cachable: false
+
+
 
   ###*
     Simple HTML Binding Template Engine.
@@ -23,23 +31,56 @@ class Ikari extends Emitter
   ###
   constructor:(options={})->
     super()
-    el         = utils.kv "el", options
-    @datas     = utils.kv "datas", options
-    @autoBuild = utils.kv "autoBuild", options, false
+    el                 = utils.kv "el", options
+    @datas             = utils.kv "datas", options
+    @autoBuild         = utils.kv "autoBuild", options, false
+    data               = utils.kv "data", options
+    renderdCache       = utils.kv "renderdCache", options
+    @cachable          = utils.kv "cachable", options
+    #コンパイラーのキャッシュ
+    @compilerCacheName = utils.kv "compilerCacheName", options
+    @_init el, data, renderdCache
 
+
+  _init:(el, data, renderdCache)=>
     unless el
       throw new Error("エレメントはなんかしていして") # or body?
 
+    if @cachable and not @compilerCacheName
+
+      @compilerCacheName = "ikari-cache" + el
+
     @builder = new Builder el, this
-    @builder.build this if @autoBuild and not @isBuilded
+    if window.localStorage and @compilerCacheName
+      cache = localStorage.getItem @compilerCacheName
+      @compiler = new Function(cache.split(',')...)
+      if @compiler and data and @autoBuild
+        @create data
+        return
+      else
+        setTimeout ()=>
+          @emit new Event(Event.BUILDED)
+        , 1
+
+    if renderdCache
+      dom = utils.erase utils.query el
+      dom.appendChild renderdCache
+
+    @builder.build this if @autoBuild and not @isBuilded and not @compiler
+    #データを初期オプションとして引き渡されていてかつ autoBuild が true になっていたらもうレンダリングまでしてしまう
+    if data and @autoBuild
+      @builder.build this
+      @create data
+    return
 
 
   ###*
     ビルドする
-    @method
+    @method build
   ###
   build:()=>
-    @builder.build this
+    unless @compiler
+      @builder.build this
     return
 
 
