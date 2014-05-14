@@ -38,6 +38,7 @@ collection = [
     "name": "めだまやき"
   }
 ]
+engine.build()
 engine.create collection
 ```
 

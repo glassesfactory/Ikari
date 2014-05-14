@@ -1,7 +1,6 @@
-
-
 class Event
   @BUILDED: "builded"
+  @UPDATED: "updated"
 
 
   type : null

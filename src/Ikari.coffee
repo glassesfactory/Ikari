@@ -3,6 +3,7 @@ Config  = require "./ikari/config"
 Builder = require "./ikari/builder"
 escaper = require "./ikari/escaper"
 Emitter = require "./ikari/emitter"
+Event   = require "./ikari/event"
 
 class Ikari extends Emitter
 
@@ -33,7 +34,6 @@ class Ikari extends Emitter
     @builder.build this if @autoBuild and not @isBuilded
 
 
-
   ###*
     ビルドする
     @method
@@ -41,7 +41,6 @@ class Ikari extends Emitter
   build:()=>
     @builder.build this
     return
-
 
 
   ###*
@@ -79,7 +78,10 @@ class Ikari extends Emitter
     children = container.children
     fragment = document.createDocumentFragment()
     fragment.appendChild(child.cloneNode(true)) for child in children when child
+    #ぶっこむ
     @builder.el.appendChild fragment
+    #イベント出す
+    @emit new Event(Event.UPDATED)
     return
 
 
