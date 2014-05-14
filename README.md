@@ -73,7 +73,7 @@ engine.create collection
 val だけ出力します。
 
 ```jade
-div(i-if="size < 30") ちゃいちーる
+div(i-if="size < 30" i-val-only) ちゃいちーる
 ```
 
 ```coffeescript
