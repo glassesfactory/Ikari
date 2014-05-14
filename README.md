@@ -7,15 +7,18 @@ Ikari
 Usage
 -------
 
+jade
 ```jade
 script(type="text/javascript" src="path/to/ikari.js")
 ```
 
+CoffeeScript
 ```coffeescript
 engine = new Ikari
   el : "#test"
 ```
 
+jade
 ```jade
 ul#test
   li(i-loop="item in collection" i-id="collections" class="age-{{ item.age }}").test
@@ -25,6 +28,7 @@ ul#test
       img(src="/assets/images/{{ item.id }}".jpg)
 ```
 
+CoffeeScript
 ```coffeescript
 collection = [
   {
@@ -60,4 +64,17 @@ engine.create collection
     </a>
   </li>
 </ul>
+```
+
+
+###なんかその他
+
+####val-only
+val だけ出力します。
+
+
+####三項演算子使えます。
+
+```jade
+div.ternary {{ size > 40 ? "わりと引く" : "まぁ…" }}
 ```
