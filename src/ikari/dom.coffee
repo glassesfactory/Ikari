@@ -124,7 +124,7 @@ class Dom
       return
     #nodeType が 3 だったら
     if @isText
-      lines.push "p.push('" + Parser.parseText @el.textContent + "');"
+      lines.push "p.push('" + Parser.parseText(@el.textContent) + "');"
     else
       lines.push "p.push('<" + @tagName + @attributes + ">');"
     # el = @_slimAttr @el.cloneNode()

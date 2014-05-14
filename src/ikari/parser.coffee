@@ -1,5 +1,7 @@
 #ぱてぃーん
-VAL_RE   = /\{{2,3}( )*(\w+|\w+\.+\w+)( )*\}{2,3}/g
+VAL_RE     = /\{{2,3}( )*(\w+|\w+\.+\w+)( )*\}{2,3}/g
+
+TERNARY_RE = /\{{2,3}( )*([\w"']+|\w+\.+\w+)( )*([><\=])+( )*(\w+|\w+\.+\w+)( )*\?( )*([\w"']+|\w+\.\w+)( )*\:( )*([\w"']+|\w+\.\w+)( )*\}{2,3}/g
 
 _getValName = (val)->
   return val.split("{").join('').split(' ').join('').split("}").join('')
@@ -52,7 +54,7 @@ Parser =
   parseText:(txt, data, scope)=>
     match = txt.match VAL_RE
     unless match
-      return txt
+      return Parser.parseTernary txt, data, scope
     for valStr in match
       isUnsafe = false
       if valStr.match(/\{{3}/g)
@@ -60,6 +62,23 @@ Parser =
       val = valStr.split("{").join("").split(" ").join("").split("}").join("")
       insertVal = if isUnsafe then "' + " + val + "+ '" else "'+ safe(" + val + ") + '"
       txt = txt.replace(valStr, insertVal)
+    return txt
+
+
+  parseTernary:(txt, data, scope)->
+    match = txt.match TERNARY_RE
+    unless match
+      return txt
+    if txt.match(/\{3}/g)
+      isUnsafe = false
+    ternary = txt.split("{").join("").split(" ").join("").split("}").join("")
+    if isUnsafe
+      txt = "' + " +  txt + "+ '"
+    else
+      ternaries = ternary.split("?")
+      statement = ternaries[0]
+      vals      = ternaries[1].split(":")
+      txt = "' + " + statement + "? safe(" + vals[0] + ") : safe(" + vals[1] + ") + '"
     return txt
 
 
