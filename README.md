@@ -72,6 +72,24 @@ engine.create collection
 ####val-only
 val だけ出力します。
 
+```jade
+div(i-if="size < 30") ちゃいちーる
+```
+
+```coffeescript
+collection = [
+  {
+    "size": 18
+  }
+]
+engine.build()
+engine.create collection
+```
+
+```html
+ちゃいちーる
+```
+
 
 ####三項演算子使えます。
 
