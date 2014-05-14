@@ -64,15 +64,19 @@ class Dom
     for attr in attributes
       if not attr.name.match(prefix + "-")
         @attributes += " " + attr.name + '="' + Parser.parseText(attr.value) + '"'
-      # @attributes += attr
-      # console.log @attributes
       hasStatements = statements.indexOf(attr.nodeName.replace(prefix + "-", ""))
       if hasStatements > -1
         statement = statements[hasStatements]
-        if statement is "loop"
-          @hasLoop = true
-        if statement is "if"
-          @hasIf  = true
+        @hasLoop = true if statement is "loop"
+        @hasIf   = true if statement is "if"
+
+
+      hasOptions = options.indexOf(attr.nodeName.replace(prefix + "-", ""))
+      if hasOptions > -1
+        opt = options[hasOptions]
+        @valOnly = true if opt is "val-only"
+
+
 
     if @hasLoop and @hasIf
       throw new Error("同時に指定はできませんよ。できないんです。勘弁して下さい。")
@@ -116,6 +120,8 @@ class Dom
   _preBuild:(lines)=>
     if @preStatement
       lines.push @preStatement
+    if @valOnly
+      return
     #nodeType が 3 だったら
     if @isText
       lines.push "p.push('" + Parser.parseText @el.textContent + "');"
