@@ -73,8 +73,8 @@ module.exports = (grunt)->
       dist:
         files:
           "dist/ikari.js": ["tmp/{,**/}*.js"]
-        options:
-          transform: ["uglifyify"]
+        # options:
+        #   transform: []
 
     #ファイル変更の監視
     watch:
@@ -115,11 +115,8 @@ module.exports = (grunt)->
   #ビルドする。これがサーバー上で実行される
   grunt.registerTask "build", ()->
     grunt.task.run [
-      "express:dev"
       "clean:default"
       "coffee:product"
-      "concat:vendors"
-      "copy:lib"
       "browserify"
     ]
 
