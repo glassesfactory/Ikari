@@ -3,16 +3,16 @@ class Event
   @UPDATED: "updated"
 
 
-  type : null
+  type: null
 
-  isPropagate : true
+  isPropagate: true
 
 
   ###*
     イベントオブジェクト
     @class Event
   ###
-  constructor:(@type)->
+  constructor: (@type) ->
 
 
 module.exports = Event

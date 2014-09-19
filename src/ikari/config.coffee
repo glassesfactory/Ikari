@@ -1,15 +1,15 @@
 Config =
-  prefix     : "i"
-  statements : [
+  prefix: "i"
+  statements: [
     "loop"
     "if"
   ]
-  options    :  [
+  options: [
     "val-only"
   ]
 
   #閉じタグ要らない奴
-  singleTags : [
+  singleTags: [
     "img"
     "input"
     "br"

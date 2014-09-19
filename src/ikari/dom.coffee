@@ -1,3 +1,4 @@
+utils = require "./utils"
 Config = require "./config"
 Parser = require "./parser"
 
@@ -13,91 +14,99 @@ singleTags  = Config.singleTags
 class Dom
 
   #オリジナル
-  el : null
+  el: null
 
-  vm : null
+  vm: null
 
-  tagName : null
+  tagName: null
 
-  isSingleTag : false
+  isSingleTag: false
 
   #最初
-  preStatement : null
+  preStatement: null
 
   #大体閉じる
-  appendStatement : null
+  appendStatement: null
 
 
-  children : null
+  children: null
 
-  hasLoop : false
+  hasLoop: false
 
-  hasIf   : false
+  hasIf: false
 
-  valOnly : false
+  valOnly: false
 
-  isText : false
+  isText: false
 
-  isContainer : false
-
-
-  parent : null
+  isContainer: false
 
 
-  constructor:(@el, @vm)->
-    @children = []
-    if @el.nodeType is 3
-      @isText = true
+  parent: null
+
+  inLoop: false
+
+
+  constructor: (@el, @vm) ->
+    this.children = []
+    if this.el.nodeType is 3
+      this.isText = true
     else
-      @tagName = @el.tagName.toLowerCase()
-      @isSingleTag = singleTags.indexOf(@tagName) > -1
+      this.tagName = this.el.tagName.toLowerCase()
+      this.isSingleTag = singleTags.indexOf(this.tagName) > -1
 
   ###*
     性格付け
     @metdho bind
   ###
-  bind:(args)=>
+  bind: (args, ignores, parent) =>
     if @isText
       return args
-    attributes = @el.attributes
-    @attributes = ""
+    attributes = this.el.attributes
+    this.attributes = ""
+    this.inLoop = true if parent and (parent.hasLoop or parent.inLoop)
+
     for attr in attributes
-      if not attr.name.match(prefix + "-")
-        @attributes += " " + attr.name + '="' + Parser.parseText(attr.value) + '"'
+      this.attributes += " " + attr.name + '="' + Parser.parseText(attr.value, args, ignores) + '"' unless attr.name.match(prefix + "-")
+
       hasStatements = statements.indexOf(attr.nodeName.replace(prefix + "-", ""))
       if hasStatements > -1
         statement = statements[hasStatements]
-        @hasLoop = true if statement is "loop"
-        @hasIf   = true if statement is "if"
+        this.hasLoop = true if statement is "loop"
+        this.hasIf   = true if statement is "if"
 
 
       hasOptions = options.indexOf(attr.nodeName.replace(prefix + "-", ""))
       if hasOptions > -1
         opt = options[hasOptions]
-        @valOnly = true if opt is "val-only"
+        this.valOnly = true if opt is "val-only"
 
+    throw new Error("同時に指定はできませんよ。できないんです。勘弁して下さい。") if this.hasLoop and this.hasIf
 
-
-    if @hasLoop and @hasIf
-      throw new Error("同時に指定はできませんよ。できないんです。勘弁して下さい。")
 
     #うーむ…
-    if @hasLoop
-      str = @el.getAttribute(prefix + "-" + "loop")
+    if this.hasLoop
+      str = this.el.getAttribute(prefix + "-" + "loop")
       loopSet = Parser.loop str
-      args.push loopSet["key"]
+      args.push loopSet["key"] if loopSet["key"].indexOf('.') < 0 and not this.inLoop
+      unless this.inLoop
+        # ルートがコンパイラ引数に登録されているかチェックし、なければ登録する。
+        root = loopSet["key"].split('.')[0]
+        args.push root if utils._inArray(root, args) < 0
+      ignores.push loopSet["item"]
       if loopSet
-        @preStatement = "for( var i = 0; i < " + loopSet["key"] + ".length; i++){ var " + loopSet["item"] + "= " + loopSet["key"] + "[i];"
-        @appendStatement = "};"
-
-    if @hasIf
-      str = @el.getAttribute(prefix + "-" + "if")
-      @preStatement = "if(" + str + "){"
-      @appendStatement = "};"
+        counter = "i" + this.vm.builder.incrementer
+        this.vm.builder.incrementer++
+        this.preStatement = "for( var " + counter + " = 0; " + counter + " < " + loopSet["key"] + ".length; " + counter + "++){ var " + loopSet["item"] + "= " + loopSet["key"] + "[" + counter + "];"
+        this.appendStatement = "};"
+    if this.hasIf
+      str = this.el.getAttribute(prefix + "-" + "if")
+      this.preStatement = "if(" + str + "){"
+      this.appendStatement = "};"
     return args
 
 
-  _checkAttr:(el)->
+  _checkAttr: (el) ->
     return
 
 
@@ -105,10 +114,14 @@ class Dom
     ラインを組み立てる
     @method build
   ###
-  build:(lines)=>
-    @_preBuild lines unless @isContainer
-    child.build(lines) for child in @children
-    @_appendBuild lines unless @isContainer
+  build: (lines) =>
+    this._preBuild lines
+    # this._preBuild lines unless this.isContainer
+    for child in this.children
+      child.inLoop = true if this.hasLoop or this.inLoop
+      child.build(lines)
+    # this._appendBuild lines unless this.isContainer
+    this._appendBuild lines
     return
 
 
@@ -117,17 +130,17 @@ class Dom
     @method _preBuild
     @private
   ###
-  _preBuild:(lines)=>
-    if @preStatement
-      lines.push @preStatement
-    if @valOnly
-      return
+  _preBuild: (lines) =>
+    # if this.valOnly
+    #   return
     #nodeType が 3 だったら
-    if @isText
-      lines.push "p.push('" + Parser.parseText(@el.textContent) + "');"
+    if this.isText
+      lines.push "p.push('" + Parser.parseText(this.el.textContent, this.vm.builder.args, this.vm.builder.ignores) + "');"
     else
-      lines.push "p.push('<" + @tagName + @attributes + ">');"
-    # el = @_slimAttr @el.cloneNode()
+      unless this.valOnly
+        lines.push "p.push('<" + this.tagName + this.attributes + ">');"
+    if this.preStatement
+      lines.push this.preStatement
     return
 
 
@@ -136,11 +149,15 @@ class Dom
     @method _appendBuild
     @private
   ###
-  _appendBuild:(lines)=>
-    if @isText
+  _appendBuild: (lines) =>
+    if this.isText
       return
-    lines.push "p.push('</" + @tagName + ">');" if not @isSingleTag
-    lines.push @appendStatement if @appendStatement
+    # if this.valOnly
+    #   return
+    lines.push this.appendStatement if this.appendStatement
+    unless this.valOnly
+      lines.push "p.push('</" + this.tagName + ">');" if not this.isSingleTag
+
     return
 
 

@@ -6,19 +6,25 @@ utils  = require "./utils"
 
 class Builder
 
-  el : null
+  el: null
 
-  funcStr : []
+  funcStr: []
+
+  args: null
+  ignores: null
+
+  incrementer: 0
 
   ###*
     HTML バインドしてきてなんかする
     @class Builder
   ###
-  constructor:(el, vm)->
-    @el = utils.query el
+  constructor: (el, vm) ->
+    this.el = utils.query el
 
-    @funcStr = ["var p = [];"]
-    @args = []
+    this.funcStr = ["var p = [];p.push.apply(p,arguments);"]
+    this.args = []
+    this.ignores = []
 
 
   ###*
@@ -26,9 +32,9 @@ class Builder
     @method build
     @param vm {Ikari}
   ###
-  build:(vm)=>
-    dom = @_parseElment @el, vm
-    @_build(dom, @funcStr, vm)
+  build: (vm) =>
+    dom = this._parseElment this.el, vm
+    this._build(dom, this.funcStr, vm)
     return
 
 
@@ -41,16 +47,17 @@ class Builder
     @param parent {Dom}
     @return {Dom}
   ###
-  _parseElment:(el, vm, parent)=>
+  _parseElment: (el, vm, parent) =>
     dom = new Dom(el, vm)
     if parent
       parent.children.push dom
       dom.parent = parent
     else
       dom.isContainer = true
+      this.container = dom
     children = el.childNodes
-    @args = dom.bind(@args)
-    @_parseElment(child, vm, dom) for child in children
+    this.args = dom.bind this.args, this.ignores, parent
+    this._parseElment child, vm, dom for child in children
     return dom
 
 
@@ -62,11 +69,11 @@ class Builder
     @param funcStrs {Array}
     @param vm {Ikari}
   ###
-  _build:(dom, funcStrs, vm)=>
+  _build: (dom, funcStrs, vm) =>
     dom.build(funcStrs)
     funcStrs.push 'return p.join("");'
     str = funcStrs.join("")
-    args = [].concat(@args)
+    args = [].concat( this.args )
     args.push str
     vm.compiler = new Function( args... )
     vm.isBuilded = true

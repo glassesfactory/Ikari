@@ -6,7 +6,7 @@ util =
     @param key {String} 取得したい key 文字列
     @param obj {Object} 存在を確認したい Object
   ###
-  kv : (key, obj, defaultValue)->
+  kv: (key, obj, defaultValue)->
     if obj.hasOwnProperty key
       return obj[key]
     else
@@ -16,7 +16,7 @@ util =
   ###*
     継承する
   ###
-  extend:(obj)->
+  extend: (obj) ->
     len = arguments.length
     arg = slice.call arguments, 1
     # arg = slice arg, 1
@@ -30,7 +30,7 @@ util =
   ###*
     dom の掃除
   ###
-  erase:(el)->
+  erase: (el)->
     el.removeChild el.firstChild while el.firstChild
     return el
 
@@ -39,7 +39,7 @@ util =
     配列の中に入っているかどうか
     @method _inArray
   ###
-  _inArray:( elem, array )->
+  _inArray: ( elem, array ) ->
     i = 0
     len = array.length
     while i < len
@@ -53,7 +53,7 @@ util =
     セレクタ取ってくる
     @method query
   ###
-  query: (q)->
+  query: (q) ->
     return if typeof q is "string" then document.querySelector q else q
 
 module.exports = util

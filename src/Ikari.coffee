@@ -5,6 +5,7 @@ escaper = require "./ikari/escaper"
 Emitter = require "./ikari/emitter"
 Event   = require "./ikari/event"
 
+
 class Ikari extends Emitter
 
   builder : null
@@ -22,55 +23,69 @@ class Ikari extends Emitter
 
   cachable: false
 
+  safe: escaper
 
+  autoAppend: false
+
+  contentOnly : false
+  #全部返す
+  allContent: false
+
+  helpers: null
 
   ###*
     Simple HTML Binding Template Engine.
     @class Ikari
     @param options {Object}
   ###
-  constructor:(options={})->
+  constructor: (options= {}) ->
     super()
     el                 = utils.kv "el", options
-    @datas             = utils.kv "datas", options
-    @autoBuild         = utils.kv "autoBuild", options, false
-    data               = utils.kv "data", options
-    renderdCache       = utils.kv "renderdCache", options
-    @cachable          = utils.kv "cachable", options
+    this.datas = utils.kv "datas", options
+    this.autoBuild = utils.kv "autoBuild", options, false
+    data  = utils.kv "data", options
+    renderdCache = utils.kv "renderdCache", options
+    this.cachable = utils.kv "cachable", options
+    this.autoAppend = utils.kv "autoAppend", options, false
+    this.contentOnly = utils.kv "contentOnly", options, false
+    this.allContent = utils.kv "allContent", options, false
+    helpers = utils.kv "helpers" , options
     #コンパイラーのキャッシュ
-    @compilerCacheName = utils.kv "compilerCacheName", options
-    @_init el, data, renderdCache
+    this.compilerCacheName = utils.kv "compilerCacheName", options
+    this._init el, data, renderdCache
+
+    if helpers
+      this._bindHelpers helpers
 
 
-  _init:(el, data, renderdCache)=>
+  _init: (el, data, renderdCache) =>
     unless el
       throw new Error("エレメントはなんかしていして") # or body?
 
-    if @cachable and not @compilerCacheName
+    if this.cachable and not this.compilerCacheName
+      this.compilerCacheName = "ikari-cache" + el
 
-      @compilerCacheName = "ikari-cache" + el
-
-    @builder = new Builder el, this
-    if window.localStorage and @compilerCacheName
-      cache = localStorage.getItem @compilerCacheName
-      @compiler = new Function(cache.split(',')...)
-      if @compiler and data and @autoBuild
-        @create data
+    this.builder = new Builder el, this
+    if window.localStorage and this.compilerCacheName
+      cache = localStorage.getItem this.compilerCacheName
+      this.compiler = new Function(cache.split(',')...)
+      if this.compiler and data and this.autoBuild
+        this.create data
         return
       else
         setTimeout ()=>
-          @emit new Event(Event.BUILDED)
+          this.emit new Event(Event.BUILDED)
         , 1
 
     if renderdCache
       dom = utils.erase utils.query el
       dom.appendChild renderdCache
 
-    @builder.build this if @autoBuild and not @isBuilded and not @compiler
+    this.builder.build this if this.autoBuild and not this.isBuilded and not this.compiler
     #データを初期オプションとして引き渡されていてかつ autoBuild が true になっていたらもうレンダリングまでしてしまう
-    if data and @autoBuild
-      @builder.build this
-      @create data
+    if data and this.autoBuild
+      this.builder.build this
+      this.create data
     return
 
 
@@ -78,9 +93,8 @@ class Ikari extends Emitter
     ビルドする
     @method build
   ###
-  build:()=>
-    unless @compiler
-      @builder.build this
+  build: =>
+    this.builder.build this unless this.compiler
     return
 
 
@@ -88,43 +102,72 @@ class Ikari extends Emitter
     作る
     @method create
   ###
-  create:(data)=>
-    unless @compiler
+  create: (data) =>
+    unless this.compiler
       throw new Error("準備出来てないじゃないですか?")
-    dom = utils.erase @builder.el
-    @_update data, dom
-    return
+    dom = utils.erase this.builder.el
+    result = this._update data, dom
+    return result
 
 
   ###*
     データを更新する
     @metho update
   ###
-  update:(data)=>
-    unless @compiler
+  update: (data) =>
+    unless this.compiler
       throw new Error("準備出来てないじゃないですか?")
-    dom = @builder.el
-    @_update data, dom
-    return
+    dom = this.builder.el
+    result = this._update data, dom
+    return result
 
 
   ###*
     @method _update
     @private
   ###
-  _update:(data, dom)=>
-    tmp = @compiler(data)
-    container = document.createElement "div"
+  _update: (data, dom) =>
+    this.datas ?= data
+
+    # tmp =  if data instanceof Array then this.compiler data... else this.compiler data
+    tmp = this.compiler data
+    container   = document.createElement "div"
     container.innerHTML = tmp
-    children = container.children
-    fragment = document.createDocumentFragment()
+    children    = container.children
+    fragment    = document.createDocumentFragment()
     fragment.appendChild(child.cloneNode(true)) for child in children when child
-    #ぶっこむ
-    @builder.el.appendChild fragment
+    if this.replace
+      parent = this.builder.el.parentNode
+      parent.removeNode(child) for child in parent.children
+      parent.appendChild fragment
     #イベント出す
-    @emit new Event(Event.UPDATED)
+    this.emit new Event(Event.UPDATED)
+    if this.contentOnly
+      isSingleNode = (fragment.childNodes[0].childNodes?.length? is 1)
+      isTextNode = (fragment.childNodes[0].childNodes[0]?.nodeType? is Node.TEXT_NODE)
+      if isSingleNode and isTextNode
+        # contentOnlyモードでノードが1つしかなかった場合。ifが深いのであとで直してくだしあ
+        return fragment.textContent
+      else
+        return fragment.childNodes[0].children
+    if this.allContent
+      return fragment.childNodes
+
+    return fragment.childNodes[0]
+
+  ###*
+    helper のバインド
+    @method _bindHelper
+    @private
+  ###
+  _bindHelpers: ( helpers ) =>
+    for helper of helpers
+      func = helpers[helper]
+      if typeof func is "function"
+        this[helper] = func
     return
 
 
-do(window)->
-  window.Ikari = Ikari
+do(window) -> window.Ikari = Ikari
+
+module.exports = Ikari

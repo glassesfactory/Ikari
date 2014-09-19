@@ -2,14 +2,14 @@ utils = require "./utils"
 
 
 class Emitter
-  listeners:{}
+  listeners: {}
 
   ###*
     イベント機能を提供する
     @class Emitter
     @constructor
   ###
-  constructor:()->
+  constructor: ->
     @listeners = {}
 
 
@@ -19,13 +19,12 @@ class Emitter
     @param {String} type イベントタイプ
     @param {Function} listener イベントが発生した時に実行するリスナー
   ###
-  on:(type, listener)->
-    @listeners ?= {}
-    if @listeners[ type ] is undefined
-      @listeners[ type ] = []
+  on: (type, listener) ->
+    this.listeners ?= {}
+    if this.listeners[ type ] is undefined
+      this.listeners[ type ] = []
 
-    if utils._inArray(listener, @listeners[type]) < 0
-      @listeners[type].push listener
+    this.listeners[type].push listener if utils._inArray(listener, this.listeners[type]) < 0
     return
 
 
@@ -35,19 +34,19 @@ class Emitter
     @param {type} type 解除したいイベントタイプ
     @param {Function} listener 紐づくリスナー
   ###
-  off:(type, listener)->
+  off: (type, listener) ->
     len = 0
-    len++ for prop of @listeners
+    len++ for prop of this.listeners
     if len < 1
       return
-    arr = @listeners[type]
+    arr = this.listeners[type]
     unless arr
       return
     i = 0
     len = arr.length
     while i < len
       if arr[i] is listener
-        if len is 1 then delete @listeners[type] else arr.splice(i,1)
+        if len is 1 then delete this.listeners[type] else arr.splice(i,1)
         break
       i++
     return
@@ -58,12 +57,11 @@ class Emitter
     @method emit
     @param {Eventer} 発火するイベントオブジェクト
   ###
-  emit:(eventObj)->
-    ary = @listeners[ eventObj.type ]
+  emit: (eventObj) ->
+    ary = this.listeners[ eventObj.type ]
     if ary isnt undefined
-      eventObj.target = @
-      for handler in ary
-        handler.call(@, eventObj) if eventObj.isPropagate and handler
+      eventObj.target = this
+      handler.call(this, eventObj) if eventObj.isPropagate and handler for handler in ary
     return
 
 
