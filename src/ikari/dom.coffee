@@ -135,7 +135,10 @@ class Dom
     #   return
     #nodeType が 3 だったら
     if this.isText
-      lines.push "p.push('" + Parser.parseText(this.el.textContent, this.vm.builder.args, this.vm.builder.ignores) + "');"
+      #ie8 は textContent がないので nodeValue
+      #ややこしい判定も IE8 は hasOwnproperty を Object インスタンスが何故か持っていないのでプロトタイプから直接呼び出し。
+      val =  if Object::hasOwnProperty.call(this.el, "textContent") then this.el.textContent else this.el.nodeValue
+      lines.push "p.push('" + Parser.parseText(val, this.vm.builder.args, this.vm.builder.ignores) + "');"
     else
       unless this.valOnly
         lines.push "p.push('<" + this.tagName + this.attributes + ">');"
@@ -152,8 +155,6 @@ class Dom
   _appendBuild: (lines) =>
     if this.isText
       return
-    # if this.valOnly
-    #   return
     lines.push this.appendStatement if this.appendStatement
     unless this.valOnly
       lines.push "p.push('</" + this.tagName + ">');" if not this.isSingleTag
