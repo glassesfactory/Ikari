@@ -117,9 +117,17 @@ class Dom
       this.preStatement = "if(" + str + "){"
       this.appendStatement = "};"
 
-    if this.hasDirective
-      #複数指定するときどうするかね
-      str = this.el.getAttribute prefix + '-' + 'on'
+    #ディレクティブがあるならパースしとく
+    this._parseDirective() if this.hasDirective
+
+    return args
+
+
+  _parseDirective: =>
+    #複数指定するときどうするかね
+    str = this.el.getAttribute prefix + '-' + 'on'
+    directives = str.split(',')
+    for str in directives
       directive = str.split(':')
       action = directive[0]
       method = directive[1]
@@ -127,9 +135,7 @@ class Dom
         path: this._getPath()
         action: action
         method: method
-    #   this.vm._methodsMap.push
-    #     path: this._getPath this
-    return args
+    return
 
 
   _getPath: =>
