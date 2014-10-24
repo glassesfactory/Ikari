@@ -45,12 +45,27 @@ Parser =
     return str
 
 
+  klsParser: (target) ->
+    target = Parser.literalClear target
+    klses = target.split(' ')
+    result = klses.join('.')
+    return result
+
+
+  literalClear: (target) ->
+    target = target.replace(/\{{2,3}( )*([\w\[\]\(\)]+|([\w\[\]\(\)]+\.)+[\w\[\]\(\),\s]+)( )*\}{2,3}/g, "")
+    return target
+
+
+
   ###*
     本文内にいるやつをパースする
     @method parseText
     @param txt {String} txt
   ###
   parseText: (txt, args, ignores, scope) ->
+    unless txt
+      return
     match = txt.match VAL_RE
     unless match
       return Parser.parseTernary txt, args, ignores, scope
@@ -84,7 +99,7 @@ Parser =
 
   _argsCheck: (args, ignores, val) ->
     key = val.split('.')[0]
-    args.push key if args.indexOf(key) is -1 and key isnt "this" and ignores.indexOf(key) is -1
+    args.push key if args.indexOf(key) is -1 and key isnt "this" and ignores.indexOf(key) is -1 and key.indexOf('"') is -1
     return
 
 

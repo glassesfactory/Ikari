@@ -75,7 +75,7 @@ class Builder
     str = funcStrs.join("")
     args = [].concat( this.args )
     args.push str
-    vm.compiler = new Function( args... )
+    vm.compiler = new Function( str )
     vm.isBuilded = true
     localStorage.setItem vm.compilerCacheName, args if vm.cachable
 

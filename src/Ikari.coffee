@@ -12,6 +12,10 @@ class Ikari extends Emitter
 
   datas : null
 
+  methods: null
+
+  _methodsMap: null
+
   compiler : null
 
   autoBuild : false
@@ -49,6 +53,8 @@ class Ikari extends Emitter
     this.autoAppend = utils.kv "autoAppend", options, false
     this.contentOnly = utils.kv "contentOnly", options, false
     this.allContent = utils.kv "allContent", options, false
+    this.methods = utils.kv "methods", options, null
+    this._methodsMap = []
     helpers = utils.kv "helpers" , options
     #コンパイラーのキャッシュ
     this.compilerCacheName = utils.kv "compilerCacheName", options
@@ -73,7 +79,7 @@ class Ikari extends Emitter
         this.create data
         return
       else
-        setTimeout ()=>
+        setTimeout =>
           this.emit new Event(Event.BUILDED)
         , 1
 
@@ -127,8 +133,7 @@ class Ikari extends Emitter
     @private
   ###
   _update: (data, dom) =>
-    this.datas ?= data
-
+    this.datas = data
     # tmp =  if data instanceof Array then this.compiler data... else this.compiler data
     tmp = this.compiler data
     container   = document.createElement "div"
@@ -153,6 +158,12 @@ class Ikari extends Emitter
     if this.allContent
       return fragment.childNodes
 
+    els = fragment.childNodes[0].children
+    #仮
+    document.getElementById("test").appendChild child.cloneNode(true) for child in els when child
+
+    this._bindMethods()
+
     return fragment.childNodes[0]
 
   ###*
@@ -165,6 +176,21 @@ class Ikari extends Emitter
       func = helpers[helper]
       if typeof func is "function"
         this[helper] = func
+    return
+
+
+  ###*
+    ディレクティブのバインド
+    @method _bindMethods
+  ###
+  _bindMethods: =>
+    for directive in this._methodsMap
+      continue unless this.methods.hasOwnProperty directive.method
+      el = utils.query(directive.path)
+      method = this.methods[directive.method]
+      el.removeEventListener directive.action, method
+      el.addEventListener directive.action, method
+
     return
 
 

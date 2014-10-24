@@ -3,6 +3,7 @@ Config =
   statements: [
     "loop"
     "if"
+    "on"
   ]
   options: [
     "val-only"
