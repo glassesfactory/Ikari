@@ -127,6 +127,7 @@ class Dom
     #複数指定するときどうするかね
     str = this.el.getAttribute prefix + '-' + 'on'
     directives = str.split(',')
+    
     for str in directives
       directive = str.split(':')
       action = directive[0]
@@ -142,7 +143,7 @@ class Dom
     parent = this.parent
     path = this.elName
     while parent
-      path = parent.elName + ' > ' + path
+      path = parent.elName + ' ' + path
       parent = parent.parent
 
     return path
@@ -151,7 +152,7 @@ class Dom
   _buildElName: =>
     elName = this.tagName
     elName += '#' + this.idName if this.idName
-    elName += this.klsName if this.klsName
+    elName += '.' + this.klsName if this.klsName
     return elName
 
 
