@@ -160,7 +160,7 @@ class Ikari extends Emitter
 
     els = fragment.childNodes[0].children
     #仮
-    document.getElementById("test").appendChild child.cloneNode(true) for child in els when child
+    this.builder.el.appendChild child.cloneNode(true) for child in els when child
 
     this._bindMethods()
 
@@ -174,8 +174,7 @@ class Ikari extends Emitter
   _bindHelpers: ( helpers ) =>
     for helper of helpers
       func = helpers[helper]
-      if typeof func is "function"
-        this[helper] = func
+      this[helper] = func if typeof func is "function"
     return
 
 
@@ -188,8 +187,9 @@ class Ikari extends Emitter
       continue unless this.methods.hasOwnProperty directive.method
       el = utils.query(directive.path)
       method = this.methods[directive.method]
-      el.removeEventListener directive.action, method
-      el.addEventListener directive.action, method
+      console.log el, directive.path
+      el?.removeEventListener directive.action, method
+      el?.addEventListener directive.action, method
 
     return
 
