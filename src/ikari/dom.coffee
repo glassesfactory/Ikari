@@ -66,6 +66,7 @@ class Dom
       this.klsName = Parser.klsParser this.el.className
       this.idName = this.el.id
       this.elName = this._buildElName()
+      
   ###*
     性格付け
     @metdho bind
@@ -127,7 +128,7 @@ class Dom
     #複数指定するときどうするかね
     str = this.el.getAttribute prefix + '-' + 'on'
     directives = str.split(',')
-    
+
     for str in directives
       directive = str.split(':')
       action = directive[0]

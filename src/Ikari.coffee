@@ -107,6 +107,7 @@ class Ikari extends Emitter
   ###*
     作る
     @method create
+    この時、テンプレートとして指定した element の中身は消去される
   ###
   create: (data) =>
     unless this.compiler
@@ -119,6 +120,7 @@ class Ikari extends Emitter
   ###*
     データを更新する
     @metho update
+    この時、テンプレートとして指定した element の中にデータが追加される
   ###
   update: (data) =>
     unless this.compiler
@@ -187,7 +189,6 @@ class Ikari extends Emitter
       continue unless this.methods.hasOwnProperty directive.method
       el = utils.query(directive.path)
       method = this.methods[directive.method]
-      console.log el, directive.path
       el?.removeEventListener directive.action, method
       el?.addEventListener directive.action, method
 
