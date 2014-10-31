@@ -5,6 +5,7 @@ escaper = require "./ikari/escaper"
 Emitter = require "./ikari/emitter"
 Event   = require "./ikari/event"
 
+INPUTS = ["input", "textarea", "select", "hidden"]
 
 class Ikari extends Emitter
 
@@ -128,6 +129,22 @@ class Ikari extends Emitter
     dom = this.builder.el
     result = this._update data, dom
     return result
+
+
+  serialize: =>
+    if this.builder.el.tagName.toLowerCase() is "form"
+      results = []
+      for el in this.builder.el.elements
+        tagName = el.tagName.toLowerCase()
+
+        if INPUTS.indexOf tagName > -1
+          value = el.value
+          name = el.name
+          result = {}
+          result[name] = value
+          results.push result
+      return results
+    return
 
 
   ###*
